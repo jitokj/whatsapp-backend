@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const Cors = require('cors');
 const Message = require("./dbMessages");
+const Pusher = require("pusher");
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -12,6 +13,16 @@ const port = process.env.PORT || 9000;
 const Connection_url = process.env.API_URL;
 app.use(express.json());
 app.use(Cors());
+const db = mongoose.connection;
+
+
+const pusher = new Pusher({
+    appId: "1100494",
+    key: "958aadfaf52da2758d3f",
+    secret: "b49967d96d99cbe065fb",
+    cluster: "ap2",
+    useTLS: true
+  });
 
 app.post("/messages/new",(req,res)=>{
     const dbMessage = req.body;
@@ -40,12 +51,22 @@ app.get('/',(req,res)=>{
     res.status(200).send('hello world');
 });
 
+
+db.once("open",()=>{
+    console.log('db connected');
+    const msgCollection = db.collection("messagecontents");
+    const changeStream = msgCollection.watch();
+    changeStream.on("change",(change)=>{
+        console.log(change);
+    })
+})
+
 mongoose.connect(Connection_url,{
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true
 }).then((_)=>{
-    console.log('connected to DATABASE!!')
+   
     app.listen(port,()=>{
         console.log(`listening on http://localhost:${port}`);
     })
