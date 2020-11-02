@@ -17,10 +17,10 @@ const db = mongoose.connection;
 
 
 const pusher = new Pusher({
-    appId: "1100494",
-    key: "958aadfaf52da2758d3f",
-    secret: "b49967d96d99cbe065fb",
-    cluster: "ap2",
+    appId: process.env.PUSHER_APP_ID,
+    key: process.env.PUSHER_KEY,
+    secret: process.env.PUSHER_SECRET,
+    cluster: process.env.PUSHER_CLUSTER,
     useTLS: true
   });
 
